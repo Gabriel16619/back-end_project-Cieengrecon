@@ -4,6 +4,7 @@
  * Autor: Gabriel Cavalcante dos Santos
  * Versão: 1.0
  ************************/
+
 const ordemServicoDAO = require('../DAO/ordem_servico.js')
 const DEFAULT_MESSAGE = require('../modulo/default_messages/config_messages.js')
 
@@ -60,6 +61,7 @@ const pegarOrdemServicoId = async function (id) {
     
 }
 
+//TESTAR
 const deletarOrdemServico = async function (id) {
 
     let MESSAGE = JSON.parse(JSON.stringify(DEFAULT_MESSAGE))
@@ -75,11 +77,24 @@ const deletarOrdemServico = async function (id) {
                 let idOrdemServico = parseInt(id)
 
                 let result = await ordemServicoDAO.setDeleteOrdemServico(idOrdemServico)
+
+                if(result){
+                    MESSAGE.HEADER.status = MESSAGE.SUCCESS_DELETE_ITEM.status
+                    MESSAGE.HEADER.status_code = MESSAGE.SUCCESS_DELETE_ITEM.status_code
+                    MESSAGE.HEADER.message = MESSAGE.SUCCESS_DELETE_ITEM.message
+                
+                    return MESSAGE.HEADER
+                
+                }else{
+                    return excluirOrdemServico
+                }
+            }else{
+                MESSAGE.ERROR_REQUIRED_FIELDS.invalid_field = "Atributo [ID] inválido!!"
+                MESSAGE.ERROR_REQUIRED_FIELDS //400
             }
         }
-
     }catch(error){
-        return false
+        return MESSAGE.ERROR_INTERNAL_SERVER_MODEL
     }
     
 }
