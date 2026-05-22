@@ -9,7 +9,7 @@ const knex = require('knex');
 const knexConfig = require('../modulo/database_config/knex.js');
 const knexDatabase = knex(knexConfig.development);
 
-const getAllIdCelulaByIdOrdemServico = await function(){
+const getAllIdCelulaByIdOrdemServico = async function(){
 
       try {
 
@@ -26,20 +26,20 @@ const getAllIdCelulaByIdOrdemServico = await function(){
     }
 }
 
-const getAllCelulaByOrdemServicoId = await function(id){
+const getAllCelulaByOrdemServicoId = async function (id) {
 
-    try{
+    try {
 
-        let sql = `select*from tb_ordem_servico_celula where id_ordem_servico_celula = ${id}`
-        let result = await knexDatabase.raw(sql)
+        let sql = `SELECT * FROM tb_ordem_servico_celula WHERE id_ordem_servico = ?`
+        let result = await knexDatabase.raw(sql, [id])
 
-        if(array.isArray(result)){
-            return result
-        }else{
+        if (Array.isArray(result[0])) {
+            return result[0]
+        } else {
             return false
         }
 
-    }catch(error){
+    } catch (error) {
         return false
     }
 }
@@ -60,25 +60,29 @@ const getSelectOrdemServicoCelulaByCelulaId = async function (id) {
 }
 
 const insertOrdemServicoAndCelula = async function (ordemServicoCelula) {
-    try {
-        let sql = `
-        INSERT INTO tb_ordem_servico_celula
-                    (id_ordem_servico,
-                     id_celula,
-                     descricao)
-                VALUES (${ordemServicoCelula.id_ordem_servico},
-                        ${ordemServicoCelula.id_celula},
-                        "${ordemServicoCelula.descricao}")`
+  try {
+    let sql = `
+      INSERT INTO tb_ordem_servico_celula (
+        id_ordem_servico,
+        id_celula,
+        descricao
+      ) VALUES (?, ?, ?)`
 
-        let result = await knexDatabase.raw(sql)
+    let result = await knexDatabase.raw(sql, [
+      ordemServicoCelula.id_ordem_servico,
+      ordemServicoCelula.id_celula,
+      ordemServicoCelula.descricao || null
+    ])
 
-        if (result)
-            return result
-        else
-            return false
-    } catch (error) {
-        return false
-    }
+    if (result[0].affectedRows > 0)
+      return true
+    else
+      return false
+
+  } catch (error) {
+    console.error('ERRO insertOrdemServicoAndCelula:', error.message)
+    return false
+  }
 }
 
 const getSelectLastIdOrdemServicoCelula = async function () {
@@ -99,7 +103,7 @@ const getSelectLastIdOrdemServicoCelula = async function () {
     }
 }   
 
-const setUpdateOrdemServicoCeluloa = async function (ordemServicoCelula) {
+const setUpdateOrdemServicoCelula = async function (ordemServicoCelula) {
 
     try {
         let sql = `UPDATE tb_ordem_servico_celula
@@ -142,12 +146,12 @@ const setDeleteOrdemServicoCelulla = async function (id) {
 
 }
 
-
 module.exports = {
     getAllIdCelulaByIdOrdemServico,
     getAllCelulaByOrdemServicoId,
     getSelectOrdemServicoCelulaByCelulaId,
     insertOrdemServicoAndCelula,
     getSelectLastIdOrdemServicoCelula,
-    setDeleteOrdemServicoCelulla 
+    setDeleteOrdemServicoCelulla ,
+    setUpdateOrdemServicoCelula
 }

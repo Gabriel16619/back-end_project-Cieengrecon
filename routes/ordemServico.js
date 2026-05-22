@@ -40,3 +40,27 @@ router.get('/:id', cors(), async function (request, response) {
     response.json(ordemServicoId)
     
 })
+
+router.delete('/:id', cors(), async function (request, response) {
+
+    let idOrdemServico = request.params.id
+
+    let ordemServicoId = await controllerOrdemServico.deletarOrdemServico(idOrdemServico)
+    response.status(ordemServicoId.status_code)
+    response.json(ordemServicoId)
+    
+})
+
+router.post('/', cors(), async function (request, response) {
+
+   console.log('BODY RECEBIDO:', request.body)   
+
+  let contentType = request.headers['content-type']
+  let publicarOrdem = request.body
+
+  let ordemServico = await controllerOrdemServico.inserirOrdemServico(publicarOrdem, contentType)
+
+  response.status(ordemServico.status_code)
+  response.json(ordemServico)
+
+})

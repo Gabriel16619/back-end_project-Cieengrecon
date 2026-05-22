@@ -29,6 +29,21 @@ const getDadosOrdemServico = async function () {
     }
 }
 
+const getAllIdCelulaByIdOrdemServico = async function (id_ordem_servico) {
+    try {
+        let sql = `SELECT * FROM tb_ordem_servico_celula WHERE id_ordem_servico = ?`
+        let result = await knexDatabase.raw(sql, [id_ordem_servico])
+
+        if (Array.isArray(result[0]))
+            return result[0]
+        else
+            return false
+
+    } catch (error) {
+        return false
+    }
+}
+
 const getDadosOrderServicoId = async function (id) {
 
     try {
@@ -47,39 +62,39 @@ const getDadosOrderServicoId = async function (id) {
 } 
 
 const setInserirOrdemServico = async function (ordemServico) {
+  try {
 
-    try{
+    let sql = `INSERT INTO tb_ordem_servico (
+      id_celula,
+      prioridade,
+      eg,
+      bruto,
+      quant_produzir,
+      meta_ph,
+      turno,
+      maquina_gargalo
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 
-let sql = `insert into tb_ordem_servico (
-        id_celula,
-        prioridade,
-        eg,
-        bruto,
-        quant_produzir,
-        meta_ph,
-        turno,
-        maquina_gargalo
-        )
-        values(
-        ${ordemServico.id_celula},
-        '${ordemServico.prioridade}',
-        '${ordemServico.eg}',
-        '${ordemServico.bruto}',
-        '${ordemServico.quant_produzir}',
-        '${ordemServico.meta_ph}',
-        '${ordemServico.turno}',
-        '${ordemServico.maquina_gargalo}')`
+    let result = await knexDatabase.raw(sql, [
+      ordemServico.id_celula,
+      ordemServico.prioridade,
+      ordemServico.eg,
+      ordemServico.bruto,
+      ordemServico.quant_produzir,
+      ordemServico.meta_ph,
+      ordemServico.turno,
+      ordemServico.maquina_gargalo
+    ])
 
-        let result = await knexDatabase.raw(sql)
+    if (result[0].affectedRows > 0)
+      return true
+    else
+      return false
 
-        if(Array.isArray(result[0]))
-            return result[0]
-        else
-            return false
-
-    }catch(error){
-        return false
-    }
+  } catch (error) {
+    console.error(error)
+    return false
+  }
 }
 
 const setUpDateOrdemServico = async function (ordemServico){
@@ -112,40 +127,47 @@ const setUpDateOrdemServico = async function (ordemServico){
     }
 }
 
-const setLastIdOrdemServico = async function (ordemServico) {
-    
-    try {
-        let sql = `select id_ordem_servico from tb_ordem_servico order by id_ordem_servico desc limit 1`
+const setLastIdOrdemServico = async function () {
+  try {
+    let sql = `SELECT id_ordem_servico FROM tb_ordem_servico ORDER BY id_ordem_servico DESC LIMIT 1`
 
-        let result = await knexDatabase.raw(sql)
+    let result = await knexDatabase.raw(sql)
 
-        if(Array.isArray(result)){
-            return Number(result[0].id_ordem_servico)
-        }else{
-            return false
-        }
-    } catch (error){
-        return false
+    const rows = result[0] 
+
+    if (Array.isArray(rows) && rows.length > 0) {
+      return Number(rows[0].id_ordem_servico) 
+    } else {
+      return false
     }
 
+  } catch (error) {
+    console.error('ERRO DAO LAST ID:', error)
+    return false
+  }
 }
 
 
 const setDeleteOrdemServico = async function (id) {
-    
-    try{
 
-        let sql = `delete from id_ordem_servico where id_ordem_servico = ${id}`
+    try {
 
-        let result = await knexDatabase.raw(sql)
+     
+        let sqlCelula = `DELETE FROM tb_ordem_servico_celula WHERE id_ordem_servico = ?`
+        await knexDatabase.raw(sqlCelula, [id])
 
-        if(Array.isArray(result)){
-            return Number(result[0].id_ordem_servico)
-        }else{
+       
+        let sqlOrdem = `DELETE FROM tb_ordem_servico WHERE id_ordem_servico = ?`
+        let result = await knexDatabase.raw(sqlOrdem, [id])
+
+        if (result[0].affectedRows > 0) {
+            return true
+        } else {
             return false
         }
 
-    }catch(error){
+    } catch (error) {
+        console.log(error)
         return false
     }
 }
@@ -153,6 +175,7 @@ const setDeleteOrdemServico = async function (id) {
 module.exports ={
     getDadosOrdemServico,
     getDadosOrderServicoId,
+    getAllIdCelulaByIdOrdemServico,
     setInserirOrdemServico,
     setLastIdOrdemServico,
     setDeleteOrdemServico,
