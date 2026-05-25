@@ -40,6 +40,13 @@ router.get('/:id', cors(), async function (request, response) {
     response.json(ordemServicoId)
     
 })
+router.get('/:celula', cors(), async function (request, response) {
+
+    let ordemServicoId = await controllerOrdemServico.listarOrdemServico()
+    response.status(ordemServicoId.status_code)
+    response.json(ordemServicoId)
+    
+})
 
 router.delete('/:id', cors(), async function (request, response) {
 
@@ -52,8 +59,7 @@ router.delete('/:id', cors(), async function (request, response) {
 })
 
 router.post('/', cors(), async function (request, response) {
-
-   console.log('BODY RECEBIDO:', request.body)   
+ 
 
   let contentType = request.headers['content-type']
   let publicarOrdem = request.body

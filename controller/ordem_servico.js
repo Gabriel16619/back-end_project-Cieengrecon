@@ -49,28 +49,31 @@ const listarOrdemServico = async function () {
 
 const pegarOrdemServicoId = async function (id) {
 
-    let MESSAGE = JSON.parse(JSON.stringify(DEFAULT_MESSAGE))
+  let MESSAGE = JSON.parse(JSON.stringify(DEFAULT_MESSAGE))
 
-    try{
-        if(!isNaN(id) && id != '' && id != null && id > 0){
+  try {
+    if (!isNaN(id) && id != '' && id != null && id > 0) {
 
-            let resultOrdemServico = await ordemServicoDAO.getDadosOrderServicoId(Number(id))
+      let resultOrdemServico = await ordemServicoDAO.getDadosOrderServicoId(Number(id))
 
-            if(resultOrdemServico.length > 0){
-                MESSAGE.HEADER.status = MESSAGE.SUCCESS_REQUEST.status
-                MESSAGE.HEADER.status_code = MESSAGE.SUCCESS_REQUEST.status_code
-                MESSAGE.HEADER.response.ordemServico = resultOrdemServico
+      if (resultOrdemServico.length > 0) {
+        MESSAGE.HEADER.status      = MESSAGE.SUCCESS_REQUEST.status
+        MESSAGE.HEADER.status_code = MESSAGE.SUCCESS_REQUEST.status_code
+        MESSAGE.HEADER.response.ordemServico = resultOrdemServico
+        return MESSAGE.HEADER
+      } else {
+        return MESSAGE.ERROR_NOT_FOUND 
+      }
 
-                return MESSAGE.HEADER
-                
-            }else{
-                return MESSAGES.ERROR_NOT_FOUND
-            }
-        }
-    }catch(error){
-         return DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+    } else {
+      return MESSAGE.ERROR_REQUIRED_FIELDS
     }
-    
+
+  } catch (error) {
+    console.error('ERRO pegarOrdemServicoId:', error)
+    return DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+  }
+
 }
 
 const inserirOrdemServico = async function (ordemServico, contentType) {
