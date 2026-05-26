@@ -13,7 +13,7 @@ const getAllIdCelulaByIdOrdemServico = async function(){
 
       try {
 
-        let sql = `select * from tb_ordem_servico_celulka order by id_ordem_servico_celula desc`
+        let sql = `select * from tb_ordem_servico_celula order by id_ordem_servico_celula desc`
         let result = await knexDatabase.raw(sql)
 
         if (Array.isArray(result)) {

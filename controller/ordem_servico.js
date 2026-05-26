@@ -18,23 +18,11 @@ const listarOrdemServico = async function () {
 
         let resultOrdemServico = await ordemServicoDAO.getDadosOrdemServico()
 
-        if (resultOrdemServico.length > 0) {
-
-            // Para cada ordem, busca as células relacionadas
-            let ordemServicoComCelulas = await Promise.all(
-                resultOrdemServico.map(async (ordemServico) => {
-                    let celulas = await ordemServicoDAO.getAllIdCelulaByIdOrdemServico(ordemServico.id_ordem_servico)
-
-                    return {
-                        ...ordemServico,
-                        celulas: celulas || [] // se não tiver células, retorna array vazio
-                    }
-                })
-            )
+        if (resultOrdemServico && resultOrdemServico.length > 0) {
 
             MESSAGE.HEADER.status                    = MESSAGE.SUCCESS_REQUEST.status
             MESSAGE.HEADER.status_code               = MESSAGE.SUCCESS_REQUEST.status_code
-            MESSAGE.HEADER.response.ordemServico     = ordemServicoComCelulas
+            MESSAGE.HEADER.response.ordemServico     = resultOrdemServico
 
             return MESSAGE.HEADER // 200
 
@@ -60,6 +48,35 @@ const pegarOrdemServicoId = async function (id) {
         MESSAGE.HEADER.status      = MESSAGE.SUCCESS_REQUEST.status
         MESSAGE.HEADER.status_code = MESSAGE.SUCCESS_REQUEST.status_code
         MESSAGE.HEADER.response.ordemServico = resultOrdemServico
+        return MESSAGE.HEADER
+      } else {
+        return MESSAGE.ERROR_NOT_FOUND 
+      }
+
+    } else {
+      return MESSAGE.ERROR_REQUIRED_FIELDS
+    }
+
+  } catch (error) {
+    console.error('ERRO pegarOrdemServicoId:', error)
+    return DEFAULT_MESSAGE.ERROR_INTERNAL_SERVER_CONTROLLER
+  }
+
+}
+
+const pegarOrdemServicoByIdCelula = async function (id_celula) {
+
+  let MESSAGE = JSON.parse(JSON.stringify(DEFAULT_MESSAGE))
+
+  try {
+    if (!isNaN(id_celula) && id_celula != '' && id_celula != null && id_celula > 0) {
+
+      let resultOrdemServicoByIdCelula = await ordemServicoDAO.getAllIdIdOrdemServicoByCelula(Number(id_celula))
+
+      if (resultOrdemServicoByIdCelula.length > 0) {
+        MESSAGE.HEADER.status      = MESSAGE.SUCCESS_REQUEST.status
+        MESSAGE.HEADER.status_code = MESSAGE.SUCCESS_REQUEST.status_code
+        MESSAGE.HEADER.response.ordemServico = resultOrdemServicoByIdCelula
         return MESSAGE.HEADER
       } else {
         return MESSAGE.ERROR_NOT_FOUND 
@@ -144,7 +161,6 @@ const inserirOrdemServico = async function (ordemServico, contentType) {
 }
 
     
-//TESTAR
 const deletarOrdemServico = async function (id) {
 
     let MESSAGE = JSON.parse(JSON.stringify(DEFAULT_MESSAGE))
@@ -232,5 +248,6 @@ module.exports = {
     listarOrdemServico,
     pegarOrdemServicoId,
     inserirOrdemServico,
-    deletarOrdemServico
+    deletarOrdemServico,
+    pegarOrdemServicoByIdCelula
 }

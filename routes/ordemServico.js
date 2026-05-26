@@ -31,18 +31,11 @@ router.get('/', cors(), async function (request, response) {
 
 module.exports = router
 
-router.get('/:id', cors(), async function (request, response) {
 
-    let idOrdemServico = request.params.id
+router.get('/:id_celula', cors(), async function (request, response) {
 
-    let ordemServicoId = await controllerOrdemServico.pegarOrdemServicoId(idOrdemServico)
-    response.status(ordemServicoId.status_code)
-    response.json(ordemServicoId)
-    
-})
-router.get('/:celula', cors(), async function (request, response) {
-
-    let ordemServicoId = await controllerOrdemServico.listarOrdemServico()
+    let idOrdemServicoByCelula = request.params.id_celula
+    let ordemServicoId = await controllerOrdemServico.pegarOrdemServicoByIdCelula(idOrdemServicoByCelula)
     response.status(ordemServicoId.status_code)
     response.json(ordemServicoId)
     

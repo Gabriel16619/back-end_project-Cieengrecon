@@ -29,10 +29,10 @@ const getDadosOrdemServico = async function () {
     }
 }
 
-const getAllIdCelulaByIdOrdemServico = async function (id_ordem_servico) {
+const getAllIdIdOrdemServicoByCelula = async function (id_celula) {
     try {
-        let sql = `SELECT * FROM tb_ordem_servico_celula WHERE id_ordem_servico = ?`
-        let result = await knexDatabase.raw(sql, [id_ordem_servico])
+        let sql = `SELECT * FROM tb_ordem_servico WHERE id_celula = ?`
+        let result = await knexDatabase.raw(sql, [id_celula])
 
         if (Array.isArray(result[0]))
             return result[0]
@@ -175,7 +175,7 @@ const setDeleteOrdemServico = async function (id) {
 module.exports ={
     getDadosOrdemServico,
     getDadosOrderServicoId,
-    getAllIdCelulaByIdOrdemServico,
+   getAllIdIdOrdemServicoByCelula,
     setInserirOrdemServico,
     setLastIdOrdemServico,
     setDeleteOrdemServico,
